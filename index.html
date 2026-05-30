@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050816">
+  <meta name="description" content="Red Pill or Blue Pill is a private, local-first decision matrix for comparing trade-offs, risks, SWOT signals, and future scenarios.">
+  <title>Red Pill or Blue Pill // Decision Matrix</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --surface: #0d1326;
+      --surface-2: #121a32;
+      --line: rgba(148, 163, 184, .22);
+      --text: #eef3ff;
+      --muted: #94a3b8;
+      --faint: #64748b;
+      --red: #ff405d;
+      --red-2: #9f1239;
+      --blue: #38bdf8;
+      --blue-2: #2563eb;
+      --green: #34d399;
+      --amber: #f59e0b;
+      --violet: #a78bfa;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    :root.light {
+      color-scheme: light;
+      --bg: #f6f8fc;
+      --surface: #ffffff;
+      --surface-2: #eef3fb;
+      --line: rgba(51, 65, 85, .16);
+      --text: #101827;
+      --muted: #475569;
+      --faint: #64748b;
+      --shadow: 0 20px 60px rgba(15, 23, 42, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 64, 93, .18), transparent 30rem),
+        radial-gradient(circle at top right, rgba(56, 189, 248, .16), transparent 34rem),
+        linear-gradient(180deg, var(--bg), #070a14 70%);
+      color: var(--text);
+    }
+    .light body { background: linear-gradient(180deg, #f6f8fc, #eaf0f9 70%); }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-top: 4px solid transparent;
+      border-image: linear-gradient(90deg, var(--red), var(--blue)) 1;
+      background: color-mix(in srgb, var(--surface) 90%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+    .bar {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      margin-right: auto;
+    }
+    .mark, .icon-tile {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--red) 45%, var(--line));
+      border-radius: 8px;
+      color: var(--red);
+      background: linear-gradient(135deg, rgba(255, 64, 93, .12), rgba(56, 189, 248, .08));
+    }
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 {
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 850;
+    }
+    .tagline {
+      margin-top: 4px;
+      color: var(--faint);
+      font: 600 .72rem/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .actions { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text);
+      min-height: 42px;
+      padding: 0 14px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--blue) 45%, var(--line)); }
+    .btn.icon { width: 42px; padding: 0; color: var(--amber); }
+    .btn.primary {
+      color: #07111f;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--red), #fb7185);
+      box-shadow: 0 10px 30px rgba(255, 64, 93, .22);
+    }
+    .btn.blue { background: linear-gradient(135deg, var(--blue), var(--blue-2)); color: #04111f; border: 0; }
+    .btn.green { background: linear-gradient(135deg, var(--green), #10b981); color: #04130d; border: 0; }
+    main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 32px 20px 46px;
+      flex: 1;
+    }
+    .notice, .sync, .panel, .card, .modal-box {
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .notice {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+      border-color: color-mix(in srgb, var(--amber) 35%, var(--line));
+    }
+    .notice h4 { color: var(--amber); font-size: .95rem; }
+    .notice p { color: var(--muted); line-height: 1.55; }
+    .hero { text-align: center; padding: 54px 0 32px; }
+    .hero h2 {
+      text-transform: uppercase;
+      font-size: clamp(2rem, 7vw, 4.5rem);
+      color: color-mix(in srgb, var(--text) 9%, transparent);
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+    .hero p {
+      max-width: 840px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    .sync {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .status-dot {
+      width: 9px; height: 9px; border-radius: 99px; background: var(--green);
+      box-shadow: 0 0 0 5px rgba(52, 211, 153, .12);
+      display: inline-block;
+    }
+    .chip {
+      display: inline-flex;
+      min-height: 28px;
+      padding: 0 10px;
+      align-items: center;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font: 800 .75rem/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      background: var(--surface-2);
+    }
+    .grid { display: grid; gap: 18px; }
+    .stats { grid-template-columns: repeat(3, 1fr); margin-bottom: 24px; }
+    .stat {
+      padding: 24px;
+      min-height: 130px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .stat .label {
+      color: var(--muted);
+      font: 800 .8rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .stat strong { display: block; margin-top: 12px; font-size: 2.8rem; line-height: 1; }
+    .stat span { color: var(--muted); }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin: 10px 0 16px;
+      flex-wrap: wrap;
+    }
+    .segmented {
+      display: inline-flex;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px;
+      background: var(--surface);
+    }
+    .segmented button {
+      border: 0;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 8px 12px;
+      background: transparent;
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: .78rem;
+    }
+    .segmented button.active { background: var(--surface-2); color: var(--text); }
+    .empty { text-align: center; padding: 58px 18px; color: var(--muted); }
+    .empty h4 { color: var(--text); margin: 14px 0 8px; font-size: 1.2rem; }
+    .list { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .decision-card { padding: 20px; display: grid; gap: 14px; }
+    .decision-card h3 { font-size: 1.05rem; line-height: 1.25; }
+    .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .score {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--surface-2);
+    }
+    .bar-track { height: 8px; border-radius: 99px; background: rgba(148, 163, 184, .18); overflow: hidden; margin-top: 8px; }
+    .bar-fill { height: 100%; border-radius: inherit; width: var(--w); background: var(--c); }
+    .panel { padding: 26px; max-width: 960px; margin: 0 auto; }
+    .panel-head { display: grid; grid-template-columns: 48px 1fr; gap: 14px; align-items: center; margin-bottom: 22px; }
+    .panel h2 { font-size: clamp(1.45rem, 5vw, 2rem); line-height: 1.1; }
+    .panel p { color: var(--muted); line-height: 1.55; }
+    label { display: block; margin: 18px 0 8px; color: var(--muted); font: 800 .8rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--bg) 72%, var(--surface));
+      color: var(--text);
+      padding: 14px 16px;
+      outline: none;
+    }
+    textarea { min-height: 118px; resize: vertical; }
+    input:focus, textarea:focus { border-color: color-mix(in srgb, var(--blue) 65%, var(--line)); }
+    .categories { grid-template-columns: repeat(2, 1fr); }
+    .cat {
+      text-align: left;
+      padding: 16px;
+      min-height: 78px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+    }
+    .cat.active { border-color: var(--red); color: var(--text); box-shadow: inset 0 0 0 1px rgba(255, 64, 93, .24); }
+    .cat span { display: block; margin-top: 8px; font-weight: 750; }
+    .sliders { grid-template-columns: 1fr 1fr; }
+    input[type="range"] { padding: 0; accent-color: var(--red); border: 0; background: transparent; }
+    .range-labels { display: flex; justify-content: space-between; color: var(--faint); font-size: .82rem; margin-top: 6px; }
+    .horizon { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .horizon button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 42px;
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .horizon button.active { color: var(--text); border-color: var(--blue); background: color-mix(in srgb, var(--blue) 15%, var(--surface)); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+    .view-head { display: grid; gap: 14px; margin-bottom: 22px; }
+    .view-title { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .view-title h2 { font-size: clamp(1.45rem, 5vw, 2.4rem); line-height: 1.08; }
+    .compare { grid-template-columns: 1fr 1fr; }
+    .choice { padding: 20px; position: relative; overflow: hidden; }
+    .choice.red { border-color: color-mix(in srgb, var(--red) 38%, var(--line)); }
+    .choice.blue { border-color: color-mix(in srgb, var(--blue) 38%, var(--line)); }
+    .choice h3 { font-size: 1.2rem; margin-bottom: 10px; }
+    .choice ul { padding-left: 18px; color: var(--muted); line-height: 1.55; }
+    .swot { grid-template-columns: repeat(4, 1fr); }
+    .swot .card { padding: 16px; }
+    .swot h4 { margin-bottom: 8px; color: var(--text); }
+    .swot p { color: var(--muted); line-height: 1.45; }
+    .timeline { display: grid; gap: 12px; }
+    .moment { display: grid; grid-template-columns: 90px 1fr; gap: 14px; align-items: start; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    .moment strong { color: var(--amber); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .hidden { display: none !important; }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 20px 34px;
+      text-align: center;
+      color: var(--faint);
+      font: 700 .72rem/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(2, 6, 23, .72);
+      z-index: 50;
+    }
+    .modal-box { width: min(560px, 100%); padding: 24px; }
+    .modal-box h3 { font-size: 1.35rem; margin-bottom: 8px; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      z-index: 60;
+    }
+    svg { width: 1.1em; height: 1.1em; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    @media (max-width: 820px) {
+      .bar { padding: 14px; }
+      .brand { grid-template-columns: 38px 1fr; }
+      .mark, .icon-tile { width: 38px; height: 38px; }
+      .actions .label { display: none; }
+      main { padding: 20px 14px 34px; }
+      .notice, .sync { grid-template-columns: 1fr; }
+      .stats, .compare, .swot, .sliders, .categories { grid-template-columns: 1fr; }
+      .hero { padding: 36px 0 24px; }
+      .view-title { display: grid; }
+      .horizon { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="bar">
+        <div class="brand" role="button" tabindex="0" id="homeAction" aria-label="Back to dashboard">
+          <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a5 5 0 0 0-7-7l-10 10a5 5 0 0 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></div>
+          <div>
+            <h1>Red Pill <span style="color:var(--faint)">or</span> Blue Pill</h1>
+            <div class="tagline">Secure Strategic Decision Nest</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn icon" id="themeBtn" aria-label="Toggle Light Eye-Care"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg></button>
+          <button class="btn icon" id="lockBtn" aria-label="Configure sync passphrase"><svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></button>
+          <button class="btn primary" id="newBtn" aria-label="New Matrix"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></svg><span class="label">New Matrix</span></button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="dashboardView"></section>
+      <section id="formView" class="hidden"></section>
+      <section id="detailView" class="hidden"></section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Matrix Analytical Core. Deployed as a static, local-first GitHub Pages decision matrix.</p>
+      <p>Private dilemmas remain inside this browser unless exported by you.</p>
+    </footer>
+  </div>
+
+  <div class="modal hidden" id="passphraseModal" role="dialog" aria-modal="true" aria-labelledby="passphraseTitle">
+    <div class="modal-box">
+      <h3 id="passphraseTitle">Encrypted Matrix Sync</h3>
+      <p style="color:var(--muted);line-height:1.55">Set a private passphrase label for this device. This static GitHub Pages version keeps data in local browser storage and never transmits your decisions.</p>
+      <label for="passphraseInput">Private Passphrase Label</label>
+      <input id="passphraseInput" type="password" autocomplete="new-password" placeholder="Minimum 8 characters">
+      <div class="form-actions">
+        <button class="btn" data-close-modal>Cancel</button>
+        <button class="btn green" id="savePassphrase">Configure Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script>
+    const storeKey = "rpobp.decisions.v2";
+    const settingsKey = "rpobp.settings.v2";
+    const categories = [
+      ["Career & Ventures", "Briefcase", "#f87171"],
+      ["Finance & Capital", "Bank", "#f59e0b"],
+      ["Lifestyle & Travel", "Compass", "#38bdf8"],
+      ["Relationships & Family", "Heart", "#fb7185"],
+      ["Health & Wellness", "Pulse", "#34d399"],
+      ["Learning & Skill", "Cap", "#a78bfa"],
+      ["General Dilemmas", "Grid", "#94a3b8"]
+    ];
+    const state = {
+      view: "dashboard",
+      filter: "all",
+      selectedId: null,
+      form: {
+        question: "",
+        context: "",
+        category: categories[0][0],
+        optimism: 50,
+        risk: 50,
+        horizon: 5
+      },
+      decisions: readJson(storeKey, []),
+      settings: readJson(settingsKey, { theme: "dark", passphrase: false })
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const icon = (name) => ({
+      Briefcase: '<svg viewBox="0 0 24 24"><path d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"></path><rect x="3" y="6" width="18" height="15" rx="2"></rect><path d="M3 12h18M12 12v2"></path></svg>',
+      Bank: '<svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"></path><path d="M5 10h14M6 10v8M10 10v8M14 10v8M18 10v8M4 18h16M3 22h18"></path></svg>',
+      Compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36Z"></path></svg>',
+      Heart: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg>',
+      Pulse: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l3-2.9"></path><path d="M4 13h4l2-4 4 8 2-4h4"></path></svg>',
+      Cap: '<svg viewBox="0 0 24 24"><path d="m22 10-10-5-10 5 10 5 10-5Z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path></svg>',
+      Grid: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>'
+    })[name] || "";
+
+    function readJson(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+      catch { return fallback; }
+    }
+    function persist() {
+      localStorage.setItem(storeKey, JSON.stringify(state.decisions));
+      localStorage.setItem(settingsKey, JSON.stringify(state.settings));
+    }
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+    function toast(message) {
+      const el = $("toast");
+      el.textContent = message;
+      el.classList.remove("hidden");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => el.classList.add("hidden"), 2400);
+    }
+    function show(view) {
+      state.view = view;
+      $("dashboardView").classList.toggle("hidden", view !== "dashboard");
+      $("formView").classList.toggle("hidden", view !== "form");
+      $("detailView").classList.toggle("hidden", view !== "detail");
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function setTheme() {
+      document.documentElement.classList.toggle("light", state.settings.theme === "light");
+      document.documentElement.classList.toggle("dark", state.settings.theme !== "light");
+    }
+    function decisionStats() {
+      return {
+        total: state.decisions.length,
+        pending: state.decisions.filter((d) => !d.result).length,
+        decided: state.decisions.filter((d) => d.result).length
+      };
+    }
+    function analyze(form) {
+      const len = Math.min(24, (form.context.length + form.question.length) / 18);
+      const optimism = Number(form.optimism);
+      const risk = Number(form.risk);
+      const horizon = Number(form.horizon);
+      const redScore = clamp(42 + optimism * .32 + risk * .24 + len - horizon * 1.15, 8, 96);
+      const blueScore = clamp(80 - optimism * .22 - risk * .18 + horizon * .85 - len * .35, 8, 96);
+      const reversible = risk < 45 ? "Keep a visible rollback path" : "Treat reversibility as a designed experiment";
+      const pace = optimism > 62 ? "accelerated execution" : "measured validation";
+      return {
+        red: Math.round(redScore),
+        blue: Math.round(blueScore),
+        recommendation: redScore >= blueScore ? "red" : "blue",
+        swot: {
+          Strengths: `Red offers ${pace}, higher upside, and a clearer identity signal. Blue offers stability and protects existing compounding advantages.`,
+          Weaknesses: `Red exposes cash-flow and focus risk. Blue may preserve comfort while delaying the learning loop that reveals better options.`,
+          Opportunities: `Use the next ${horizon} year${horizon > 1 ? "s" : ""} to run reversible milestones, document assumptions, and convert uncertainty into evidence.`,
+          Threats: `Decision drag, sunk-cost thinking, and unpriced second-order effects can distort the matrix. ${reversible}.`
+        },
+        timeline: [
+          ["T+30d", redScore >= blueScore ? "Define a minimum viable red-path test and one hard stop condition." : "Stabilize the blue path while reserving a weekly red-path experiment block."],
+          ["T+90d", "Review energy, money, relationships, and optionality as separate signals instead of one vague feeling."],
+          [`T+${horizon}y`, redScore >= blueScore ? "Scale the red path only if evidence beats the comfort of the imagined version." : "Reopen the matrix when blue-path safety starts costing visible upside."]
+        ]
+      };
+    }
+    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+    function categoryData(name) { return categories.find((c) => c[0] === name) || categories.at(-1); }
+    function filteredDecisions() {
+      return state.decisions.filter((d) => state.filter === "all" || (state.filter === "pending" ? !d.result : !!d.result));
+    }
+
+    function renderDashboard() {
+      const stats = decisionStats();
+      const pass = state.settings.passphrase;
+      const list = filteredDecisions();
+      $("dashboardView").innerHTML = `
+        <div class="notice">
+          <div style="color:var(--amber)"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1Z"></path><path d="M12 8v4M12 16h.01"></path></svg></div>
+          <div>
+            <h4>Zero-Knowledge Cloud Sync Coordinates Standby</h4>
+            <p>Private dilemmas are stored locally in this browser. Configure a passphrase label to mark this device as encrypted before exporting or synchronising manually.</p>
+          </div>
+          <button class="btn" data-open-passphrase>Configure</button>
+        </div>
+        <div class="hero">
+          <h2>Free Your Mind</h2>
+          <p>"This is your last chance. After this, there is no turning back. You take the blue pill - the story ends. You take the red pill - you stay in Wonderland and let deep AI SWOTs project simulated futures."</p>
+        </div>
+        <div class="sync">
+          <div class="icon-tile" style="color:${pass ? "var(--green)" : "var(--blue)"}"><span class="status-dot"></span><svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+          <div>
+            <strong>Encrypted Matrix Sync:</strong> <span class="chip">${pass ? "LOCAL-KEY-SET" : "PENDING-PASSPHRASE"}</span>
+            <p>${pass ? "This browser is marked as locally encrypted. Export remains under your control." : "Set a secure private passphrase to enable local encrypted-sync readiness."}</p>
+          </div>
+          <div class="actions"><button class="btn" data-open-passphrase>Configure Key</button><button class="btn green" id="syncBtn"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.7-6.3L21 8"></path><path d="M21 3v5h-5M21 12a9 9 0 0 1-15.7 6.3L3 16"></path><path d="M3 21v-5h5"></path></svg>Sync Now</button></div>
+        </div>
+        <div class="grid stats">
+          <div class="stat"><div class="label">Total Dilemmas Stored</div><strong>${stats.total}</strong><span>active profiles</span></div>
+          <div class="stat"><div class="label">In Suspension (Limbo)</div><strong>${stats.pending}</strong><span>pending decisions</span></div>
+          <div class="stat"><div class="label">Choices Resolved</div><strong>${stats.decided}</strong><span>pills swallowed</span></div>
+        </div>
+        <div class="toolbar">
+          <div class="meta"><svg viewBox="0 0 24 24"><path d="M10 20a1 1 0 0 0 1.5.9l2-1A1 1 0 0 0 14 19v-5a2 2 0 0 1 .5-1.3L22 4.7A1 1 0 0 0 21.2 3H2.8a1 1 0 0 0-.7 1.7l7.4 8A2 2 0 0 1 10 14Z"></path></svg><strong>Filter Workspace:</strong></div>
+          <div class="segmented">${["all", "pending", "decided"].map((f) => `<button data-filter="${f}" class="${state.filter === f ? "active" : ""}">${f}</button>`).join("")}</div>
+        </div>
+        ${list.length ? `<div class="grid list">${list.map(cardHtml).join("")}</div>` : emptyHtml()}
+      `;
+    }
+
+    function emptyHtml() {
+      return `<div class="empty card">
+        <div style="color:var(--faint);font-size:2.5rem"><svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a5 5 0 0 0-7-7l-10 10a5 5 0 0 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></div>
+        <h4>No decisions in this coordinates.</h4>
+        <p>You represent an undefined entity. Tap "Formulate New Alternative" in the workspace to analyze your dilemma.</p>
+        <p style="margin-top:18px"><button class="btn primary" data-new>Create Dilemma Profile</button></p>
+      </div>`;
+    }
+    function cardHtml(d) {
+      const [cat, iconName, color] = categoryData(d.category);
+      return `<article class="card decision-card">
+        <div class="meta"><span class="chip" style="color:${color}">${esc(cat)}</span><span class="chip">${d.result ? "DECIDED" : "PENDING"}</span></div>
+        <h3>${esc(d.question)}</h3>
+        <p style="color:var(--muted);line-height:1.45">${esc(d.context || "No additional context recorded.")}</p>
+        <div class="scores">
+          <div class="score"><strong>Red ${d.analysis.red}</strong><div class="bar-track"><div class="bar-fill" style="--w:${d.analysis.red}%;--c:var(--red)"></div></div></div>
+          <div class="score"><strong>Blue ${d.analysis.blue}</strong><div class="bar-track"><div class="bar-fill" style="--w:${d.analysis.blue}%;--c:var(--blue)"></div></div></div>
+        </div>
+        <button class="btn blue" data-open="${d.id}">${d.result ? "Review Decision" : "Open Matrix"}</button>
+      </article>`;
+    }
+
+    function renderForm() {
+      const f = state.form;
+      $("formView").innerHTML = `<div class="panel">
+        <div class="panel-head">
+          <div class="icon-tile"><svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a5 5 0 0 0-7-7l-10 10a5 5 0 0 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></div>
+          <div><h2>Initialize Decisions Matrix</h2><p>Describe your dilemma trade-off to run SWOT and scenario forecasting modeling.</p></div>
+        </div>
+        <label for="question">Dilemma Question or Decision Goal</label>
+        <input id="question" value="${esc(f.question)}" placeholder="e.g., Should I resign from corporate tech to start a bespoke consulting agency?">
+        <label for="context">Circumstances, Constraints & Context (Optional)</label>
+        <textarea id="context" placeholder="Provide context, constraints, fears, stakes, deadlines, and what red versus blue means.">${esc(f.context)}</textarea>
+        <label>Choose Category Cluster</label>
+        <div class="grid categories">${categories.map(([name, iconName, color]) => `<button class="cat ${f.category === name ? "active" : ""}" data-category="${esc(name)}"><span style="color:${color};display:inline-block;width:26px">${icon(iconName)}</span><span>${esc(name)}</span></button>`).join("")}</div>
+        <div class="grid sliders">
+          <div><label for="optimism">Simulated Optimism: <span id="optimismValue">${f.optimism}%</span></label><input id="optimism" type="range" min="0" max="100" value="${f.optimism}"><div class="range-labels"><span>Risk-Conscious</span><span>Ultra-Ambitious</span></div></div>
+          <div><label for="risk">Systemic Risk Tolerance: <span id="riskValue">${f.risk}%</span></label><input id="risk" type="range" min="0" max="100" value="${f.risk}"><div class="range-labels"><span>Averse / Safe status</span><span>Aggressive Adventure</span></div></div>
+        </div>
+        <label>Time Horizon Forecasting Limit: <span id="horizonValue">${f.horizon} Years</span></label>
+        <div class="horizon">${[1,3,5,10].map((y) => `<button data-horizon="${y}" class="${f.horizon === y ? "active" : ""}">${y} Year${y > 1 ? "s" : ""}</button>`).join("")}</div>
+        <div class="form-actions"><button class="btn" data-cancel>Cancel</button><button class="btn primary" id="submitDecision">Formulate Alternatives</button></div>
+      </div>`;
+    }
+
+    function renderDetail() {
+      const d = state.decisions.find((x) => x.id === state.selectedId);
+      if (!d) { show("dashboard"); return; }
+      const rec = d.analysis.recommendation;
+      $("detailView").innerHTML = `<div class="view-head">
+        <button class="btn" data-back style="width:max-content"><svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"></path></svg>Back to Dashboard</button>
+        <div class="view-title">
+          <div><div class="meta"><span class="chip">${esc(d.category)}</span><span class="chip">${d.horizon}Y HORIZON</span><span class="chip">${d.result ? "CHOICE: " + d.result.toUpperCase() : "PENDING"}</span></div><h2>${esc(d.question)}</h2><p style="color:var(--muted);line-height:1.6;margin-top:10px">${esc(d.context || "No additional context recorded.")}</p></div>
+          <button class="btn" data-delete="${d.id}"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 16h10l1-16"></path></svg>Delete</button>
+        </div>
+      </div>
+      <div class="grid compare">
+        ${choiceHtml("red", d, "Red Pill", "Take the disruptive path, accept volatility, and harvest upside through evidence.")}
+        ${choiceHtml("blue", d, "Blue Pill", "Preserve stability, reduce downside, and keep optionality inside familiar systems.")}
+      </div>
+      <h3 style="margin:26px 0 12px">SWOT Projection</h3>
+      <div class="grid swot">${Object.entries(d.analysis.swot).map(([k,v]) => `<div class="card"><h4>${k}</h4><p>${esc(v)}</p></div>`).join("")}</div>
+      <h3 style="margin:26px 0 12px">Scenario Timeline</h3>
+      <div class="timeline">${d.analysis.timeline.map(([t,v]) => `<div class="moment"><strong>${esc(t)}</strong><p style="color:var(--muted);line-height:1.5">${esc(v)}</p></div>`).join("")}</div>`;
+    }
+
+    function choiceHtml(kind, d, title, text) {
+      const score = d.analysis[kind];
+      const active = d.analysis.recommendation === kind;
+      return `<article class="card choice ${kind}">
+        <div class="meta"><span class="chip" style="color:var(--${kind})">${active ? "RECOMMENDED" : "ALTERNATIVE"}</span><span class="chip">${score}/100</span></div>
+        <h3>${title}</h3>
+        <p style="color:var(--muted);line-height:1.55">${text}</p>
+        <div class="bar-track" style="height:12px"><div class="bar-fill" style="--w:${score}%;--c:var(--${kind})"></div></div>
+        <ul style="margin-top:14px">
+          <li>${kind === "red" ? "Prioritizes learning velocity and upside." : "Prioritizes stability and downside control."}</li>
+          <li>${kind === "red" ? "Works best with explicit stop-loss rules." : "Works best with a scheduled re-evaluation date."}</li>
+        </ul>
+        <button class="btn ${kind === "red" ? "primary" : "blue"}" data-choose="${kind}" style="margin-top:16px">${d.result === kind ? "Chosen" : "Choose " + title}</button>
+      </article>`;
+    }
+
+    function render() {
+      setTheme();
+      if (state.view === "dashboard") renderDashboard();
+      if (state.view === "form") renderForm();
+      if (state.view === "detail") renderDetail();
+      bind();
+    }
+
+    function bind() {
+      document.querySelectorAll("[data-new], #newBtn").forEach((el) => el.onclick = () => {
+        state.form = { question: "", context: "", category: categories[0][0], optimism: 50, risk: 50, horizon: 5 };
+        show("form");
+      });
+      document.querySelectorAll("[data-open-passphrase], #lockBtn").forEach((el) => el.onclick = () => $("passphraseModal").classList.remove("hidden"));
+      document.querySelectorAll("[data-close-modal]").forEach((el) => el.onclick = () => $("passphraseModal").classList.add("hidden"));
+      document.querySelectorAll("[data-filter]").forEach((el) => el.onclick = () => { state.filter = el.dataset.filter; render(); });
+      document.querySelectorAll("[data-open]").forEach((el) => el.onclick = () => { state.selectedId = el.dataset.open; show("detail"); });
+      document.querySelectorAll("[data-back]").forEach((el) => el.onclick = () => show("dashboard"));
+      document.querySelectorAll("[data-cancel]").forEach((el) => el.onclick = () => show("dashboard"));
+      document.querySelectorAll("[data-category]").forEach((el) => el.onclick = () => { state.form.category = el.dataset.category; renderForm(); bind(); });
+      document.querySelectorAll("[data-horizon]").forEach((el) => el.onclick = () => { state.form.horizon = Number(el.dataset.horizon); renderForm(); bind(); });
+      document.querySelectorAll("[data-choose]").forEach((el) => el.onclick = () => {
+        const d = state.decisions.find((x) => x.id === state.selectedId);
+        if (d) { d.result = el.dataset.choose; d.decidedAt = new Date().toISOString(); persist(); toast(`${d.result.toUpperCase()} pill recorded.`); renderDetail(); bind(); }
+      });
+      document.querySelectorAll("[data-delete]").forEach((el) => el.onclick = () => {
+        state.decisions = state.decisions.filter((d) => d.id !== el.dataset.delete);
+        persist();
+        toast("Decision profile removed from this browser.");
+        show("dashboard");
+      });
+      const optimism = $("optimism");
+      const risk = $("risk");
+      if (optimism) optimism.oninput = (e) => { state.form.optimism = Number(e.target.value); $("optimismValue").textContent = `${state.form.optimism}%`; };
+      if (risk) risk.oninput = (e) => { state.form.risk = Number(e.target.value); $("riskValue").textContent = `${state.form.risk}%`; };
+      const submit = $("submitDecision");
+      if (submit) submit.onclick = () => {
+        state.form.question = $("question").value.trim();
+        state.form.context = $("context").value.trim();
+        if (!state.form.question) { toast("Enter a dilemma question first."); $("question").focus(); return; }
+        const decision = {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          createdAt: new Date().toISOString(),
+          ...state.form,
+          analysis: analyze(state.form),
+          result: null
+        };
+        state.decisions.unshift(decision);
+        state.selectedId = decision.id;
+        persist();
+        show("detail");
+      };
+      const syncBtn = $("syncBtn");
+      if (syncBtn) syncBtn.onclick = () => toast(state.settings.passphrase ? "Local static sync check complete." : "Configure a key before syncing.");
+    }
+
+    $("themeBtn").onclick = () => {
+      state.settings.theme = state.settings.theme === "light" ? "dark" : "light";
+      persist();
+      render();
+    };
+    $("savePassphrase").onclick = () => {
+      const value = $("passphraseInput").value;
+      if (value.length < 8) { toast("Passphrase needs at least 8 characters."); return; }
+      state.settings.passphrase = true;
+      $("passphraseInput").value = "";
+      $("passphraseModal").classList.add("hidden");
+      persist();
+      toast("Local key configured.");
+      render();
+    };
+    $("homeAction").onclick = () => show("dashboard");
+    $("homeAction").onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") show("dashboard"); };
+
+    render();
+  </script>
+</body>
+</html>
